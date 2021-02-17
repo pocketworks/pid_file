@@ -15,8 +15,10 @@ defmodule PidFile.Application do
           [{PidFile.Worker, [file: file]}]
 
         {:SYSTEM, env_var} when is_binary(env_var) or is_list(env_var) ->
-          case :os.getenv(env_var) do
-            false -> throw("Missing Environment Variable:  #{env_var}")
+          env_var = if is_list(env_var), do: IO.iodata_to_binary(env_var), else: env_var
+
+          case System.get_env(env_var) do
+            nil -> throw("Missing Environment Variable:  #{env_var}")
             file -> [{PidFile.Worker, [file: file]}]
           end
       end
